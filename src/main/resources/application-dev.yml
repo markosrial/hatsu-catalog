@@ -1,0 +1,21 @@
+spring:
+  ## Persistence ##
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:devdb
+    username: sa
+    password:
+  ## Dev-tools ##
+  devtools:
+    restart:
+      trigger-file: reload
+    livereload:
+      enabled: false
+server:
+  ## Message errors ##
+  error:
+    include-message: always
+    include-stacktrace: always
