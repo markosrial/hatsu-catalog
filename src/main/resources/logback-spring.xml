@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <springProperty scope="context" name="app_name" source="spring.application.name"/>
+    <springProperty scope="context" name="app_version" source="spring.application.version"/>
+    <springProperty name="logstashUrl" source="logback.destination.url" defaultValue="localhost"/>
+    <springProperty name="logstashPort" source="logback.destination.port" defaultValue="5000"/>
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${logstashUrl}:${logstashPort}</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <timeZone>UTC</timeZone>
+        </encoder>
+    </appender>
+    <root>
+        <!-- Load appender for specific profile -->
+        <springProfile name="dev">
+            <appender-ref ref="logstash"/>
+        </springProfile>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

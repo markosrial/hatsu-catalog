@@ -28,9 +28,6 @@ logging:
     com.hitomi.hop: debug
     org.hibernate.sql: debug
     org.springframework.data.elasticsearch: debug
-  loghstash:
-    host: localhost
-    port: 5000
 management:
   endpoint:
     health:

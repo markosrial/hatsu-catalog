@@ -13,7 +13,7 @@
 	</parent>
 
 	<!-- ******* PARENT INFO ******* -->
-	<groupId>com.hitomi</groupId>
+	<groupId>com.hitomi.hop</groupId>
 	<artifactId>hatsu-catalog</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Hatsu Catalog</name>
@@ -26,12 +26,16 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
+		<docker.image.prefix>hitomi.hop</docker.image.prefix>
+
+		<!-- ======= SPRING VERSIONS ======= -->
+		<spring-cloud.version>2020.0.3</spring-cloud.version>
 
 		<!-- ======= DEPENDENCIES VERSIONS ======= -->
-		<jjwt.version>0.9.1</jjwt.version>
-		<jacoco.version>0.8.7</jacoco.version>
+		<lombok.version>1.18.20</lombok.version>
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
-
+		<jacoco.version>0.8.7</jacoco.version>
+		<logstash-encoder.version>6.3</logstash-encoder.version>
 	</properties>
 
 	<!-- ******* PROFILES ******* -->
@@ -42,10 +46,20 @@
 	<!-- ******* DEPENDENCIES ******* -->
 	<dependencies>
 
+		<!-- ======= SPRING CLOUD ======= -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+
 		<!-- ======= SPRING ======= -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -54,6 +68,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -67,27 +85,26 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-		</dependency>
-
-		<!-- ======= LOMBOK ======= -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<!-- ======= JAVA JWT ======= -->
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>${jjwt.version}</version>
 		</dependency>
 
 		<!-- ======= DATABASE ======= -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- ======= LOMBOK ======= -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- ======= MAPPING ======= -->
@@ -96,7 +113,29 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
+
+
+		<!-- ======= LOGGING ======= -->
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash-encoder.version}</version>
+		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<!-- Spring Cloud - Bill Of Materials -->
+			<!-- Contains all the third-party libraries and dependencies that are used in the cloud project
+				 and the version numbers of the individual projects -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<!-- ******* BUILD ******* -->
 	<build>
@@ -107,6 +146,9 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<image>
+						<name>${docker.image.prefix}/${project.artifactId}:${project.version}</name>
+					</image>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -129,6 +171,16 @@
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
 							<version>${mapstruct.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok-mapstruct-binding</artifactId>
+							<version>0.2.0</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: hatsu-catalog
+    version: @version@
   ## Persistence ##
   jpa:
     hibernate:
@@ -9,8 +12,6 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
-      minimum-idle: 10
-      maximum-pool-size: 20
       idle-timeout: 600000
       max-lifetime: 1800000
       connection-timeout: 30000
@@ -24,6 +25,5 @@ server:
     include-stacktrace: never
 logging:
   level:
-    org:
-      hibernate:
-        SQL: debug
+    root: warn
+    com.hitomi.hop: info
